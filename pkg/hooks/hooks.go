@@ -8,6 +8,7 @@ type Hooks interface {
 	Version() string
 	Success(*SuccessHookConfig) error
 	NoRelease(*NoReleaseConfig) error
+	PreRelease(*SuccessHookConfig) error
 }
 
 type ChainedHooksExecutor struct {
@@ -29,6 +30,17 @@ func (c *ChainedHooksExecutor) NoRelease(config *NoReleaseConfig) error {
 	for _, h := range c.HooksChain {
 		name := h.Name()
 		err := h.NoRelease(config)
+		if err != nil {
+			return fmt.Errorf("%s hook has failed: %w", name, err)
+		}
+	}
+	return nil
+}
+
+func (c *ChainedHooksExecutor) PreRelease(config *SuccessHookConfig) error {
+	for _, h := range c.HooksChain {
+		name := h.Name()
+		err := h.PreRelease(config)
 		if err != nil {
 			return fmt.Errorf("%s hook has failed: %w", name, err)
 		}

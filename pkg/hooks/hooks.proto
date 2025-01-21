@@ -69,4 +69,5 @@ service HooksPlugin {
   rpc Version(HooksVersion.Request) returns (HooksVersion.Response);
   rpc Success(SuccessHook.Request) returns (SuccessHook.Response);
   rpc NoRelease(NoReleaseHook.Request) returns (NoReleaseHook.Response);
+  rpc PreRelease(SuccessHook.Request) returns (SuccessHook.Response);
 }

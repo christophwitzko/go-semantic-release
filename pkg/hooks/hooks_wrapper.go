@@ -47,6 +47,15 @@ func (h *Server) NoRelease(_ context.Context, request *NoReleaseHook_Request) (*
 	return res, nil
 }
 
+func (h *Server) PreRelease(_ context.Context, request *SuccessHook_Request) (*SuccessHook_Response, error) {
+	err := h.Impl.PreRelease(request.Config)
+	res := &SuccessHook_Response{}
+	if err != nil {
+		res.Error = err.Error()
+	}
+	return res, nil
+}
+
 type Client struct {
 	Impl HooksPluginClient
 }
@@ -95,6 +104,19 @@ func (h *Client) Success(config *SuccessHookConfig) error {
 
 func (h *Client) NoRelease(config *NoReleaseConfig) error {
 	res, err := h.Impl.NoRelease(context.Background(), &NoReleaseHook_Request{
+		Config: config,
+	})
+	if err != nil {
+		return err
+	}
+	if res.Error != "" {
+		return errors.New(res.Error)
+	}
+	return nil
+}
+
+func (h *Client) PreRelease(config *SuccessHookConfig) error {
+	res, err := h.Impl.PreRelease(context.Background(), &SuccessHook_Request{
 		Config: config,
 	})
 	if err != nil {
