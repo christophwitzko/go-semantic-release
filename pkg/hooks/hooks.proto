@@ -63,8 +63,6 @@ message NoReleaseHook {
   }
 }
 
-
-
 service HooksPlugin {
   rpc Init(HooksInit.Request) returns (HooksInit.Response);
   rpc Name(HooksName.Request) returns (HooksName.Response);
