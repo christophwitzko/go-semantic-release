@@ -284,6 +284,20 @@ func cliHandler(cmd *cobra.Command, _ []string) {
 		exitIfError(errors.New("DRY RUN: no release was created"), 0)
 	}
 
+	herr := hooksExecutor.PreRelease(&hooks.SuccessHookConfig{
+		Commits:     commits,
+		PrevRelease: release,
+		NewRelease: &semrel.Release{
+			SHA:     currentSha,
+			Version: newVer,
+		},
+		Changelog: changelogRes,
+		RepoInfo:  repoInfo,
+	})
+	if herr != nil {
+		logger.Printf("there was an error executing the hooks plugins: %s", herr.Error())
+	}
+
 	logger.Println("creating release...")
 	newRelease := &provider.CreateReleaseConfig{
 		Changelog:  changelogRes,
@@ -318,7 +332,7 @@ func cliHandler(cmd *cobra.Command, _ []string) {
 		}
 	}
 
-	herr := hooksExecutor.Success(&hooks.SuccessHookConfig{
+	herr = hooksExecutor.Success(&hooks.SuccessHookConfig{
 		Commits:     commits,
 		PrevRelease: release,
 		NewRelease: &semrel.Release{
